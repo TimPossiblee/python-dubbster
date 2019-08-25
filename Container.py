@@ -5,12 +5,6 @@ from Stream import Stream
 
 class Container:
     def __init__(self, file, load_type='FFPROBE'):
-        if load_type is 'FFPROBE':
-            self.loaded = self.ffprobe(file)
-        elif load_type is 'STORAGE':
-            self.loaded = self.storage_info(file)
-        else:
-            self.loaded = False
         self.streams = []
         self.duration = None
         self.duration_exact = None
@@ -20,6 +14,12 @@ class Container:
         self.file_extension = None
         self.container_size = None
         self.container_fps = None
+        if load_type is 'FFPROBE':
+            self.loaded = self.ffprobe(file)
+        elif load_type is 'STORAGE':
+            self.loaded = self.storage_info(file)
+        else:
+            self.loaded = False
 
     def storage_info(self, file):
         try:
