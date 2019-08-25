@@ -4,7 +4,13 @@ from Stream import Stream
 
 
 class Container:
-    def __init__(self, file):
+    def __init__(self, file, load_type='FFPROBE'):
+        if load_type is 'FFPROBE':
+            self.loaded = self.ffprobe(file)
+        elif load_type is 'STORAGE':
+            self.loaded = self.storage_info(file)
+        else:
+            self.loaded = False
         self.streams = []
         self.duration = None
         self.duration_exact = None
@@ -14,9 +20,19 @@ class Container:
         self.file_extension = None
         self.container_size = None
         self.container_fps = None
-        self.loaded = self.info(file)
 
-    def info(self, file):
+    def storage_info(self, file):
+        try:
+            self.duration_exact = file['duration_exact']
+            self.container_fps = file['fps']
+            self.container_size = f"{file['width']}x{file['height']}"
+            # self.file_path
+        except Exception as e:
+            print(e)
+            return False
+        return True
+
+    def ffprobe(self, file):
         try:
             data = ffmpeg.probe(file, cmd='ffprobe')
             streams = []
@@ -45,6 +61,7 @@ class Container:
                 streams.append(obj)
 
             self.streams = streams
-            return True
-        except:
+        except Exception as e:
+            print(e)
             return False
+        return True
