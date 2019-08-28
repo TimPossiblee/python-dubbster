@@ -1,19 +1,16 @@
-import os
 import ffmpeg
 from Stream import Stream
 
 
-class Container:
+class Source:
     def __init__(self, file, load_type='FFPROBE'):
         self.streams = []
         self.duration = None
         self.duration_exact = None
         self.file_path = file
-        self.file_directory = None
-        self.file_name = None
-        self.file_extension = None
         self.container_size = None
         self.container_fps = None
+
         if load_type is 'FFPROBE':
             self.loaded = self.ffprobe(file)
         elif load_type is 'STORAGE':
@@ -23,10 +20,11 @@ class Container:
 
     def storage_info(self, file):
         try:
-            self.duration_exact = file['duration_exact']
+            self.duration_exact = float(file['duration_exact'])
+            self.duration = int(file['duration_exact'])
             self.container_fps = file['fps']
             self.container_size = f"{file['width']}x{file['height']}"
-            # self.file_path
+            self.streams.append(Stream(file['audio'], 0, 'AUDIO', file['language']))
         except Exception as e:
             print(e)
             return False
@@ -39,16 +37,13 @@ class Container:
 
             self.duration = int(float(data["format"]["duration"]))
             self.duration_exact = float(data["format"]["duration"])
-            path = data["format"]["filename"]
-            self.file_directory, file_name = os.path.split(os.path.abspath(path))
-            self.file_name, self.file_extension = os.path.splitext(file_name)
 
             for stream in data["streams"]:
                 language = "und"
                 if "tags" in stream and "language" in stream["tags"]:
                     language = stream["tags"]["language"]
 
-                obj = Stream(path, stream["index"], stream["codec_type"], language, stream["start_time"])
+                obj = Stream(self.file_path, stream["index"], stream["codec_type"], language)
 
                 if obj.codec_type == "video":
                     obj.width = stream["width"]

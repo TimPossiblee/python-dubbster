@@ -1,5 +1,5 @@
 import uuid
-from Container import Container
+from Source import Source
 import os
 import ImageProcessing
 import FileHandler
@@ -12,7 +12,7 @@ class Sync:
 
     def __init__(self, source1, source2, frame_path, seek=(0.5, 0.85), force=False):
         self.uid = str(uuid.uuid4())
-        self.sources = [Container(source1), Container(source2)]
+        self.sources = [Source(source1), Source(source2)]
         self.frame_path = frame_path
         self.seek = seek
         self.rtd = None
