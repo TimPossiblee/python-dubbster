@@ -3,3 +3,4 @@ backup
 batch
 logs
 tmp
+__pycache__
