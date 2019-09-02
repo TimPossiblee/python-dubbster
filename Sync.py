@@ -10,13 +10,26 @@ import math
 
 class Sync:
 
-    def __init__(self, source1, source2, frame_path, seek=(0.5, 0.85), force=False):
+    def __init__(self, source1, source2, frame_path, seek=(0.5, 0.85), force=False, reversed_sync=False):
         self.uid = str(uuid.uuid4())
-        self.sources = [Source(source1), Source(source2)]
+        if reversed_sync:
+            data = FileHandler.load_archive(source1)
+            self.sources = [Source(data, load_type='ARCHIVE'), Source(source2)]
+            self.reference = None
+            self.seek = data["#ref"]["#seek"]
+            self.seek_time = data["#ref"]["#seek_time"]
+        else:
+            self.sources = [Source(source1), Source(source2)]
+            self.reference = None
+            self.seek = seek
+            self.seek_time = None
+
         self.frame_path = frame_path
-        self.seek = seek
         self.rtd = None
         self.delay_ms = None
+        self.bulk = None
+        self.bulk_reference = None
+        self.reversed_sync = reversed_sync
         self.messages = []
         self.errmsg = []
         self.successful = False
@@ -41,7 +54,7 @@ class Sync:
             return False
 
         self.rtd = float(sources[0].duration_exact) - \
-            float(sources[1].duration_exact)
+                   float(sources[1].duration_exact)
 
         if int(sources[0].container_fps * 100) != int(sources[1].container_fps * 100):
             message = f"inputs {sources[0].container_fps, sources[1].container_fps} don't share the same fps"
@@ -72,7 +85,7 @@ RTD: {self.rtd}s
                 vframes = self.calc_run_one_vframes(
                     self.rtd, sources[0].container_fps)
                 time_offset = seek_time - \
-                    int(vframes / 2 / sources[0].container_fps)
+                              int(vframes / 2 / sources[0].container_fps)
             elif run is 1:
                 data = self.calc_run_two(
                     index_offset, seek_time, sources[0].container_fps)

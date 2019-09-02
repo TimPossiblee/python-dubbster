@@ -16,6 +16,13 @@ def scan_dir(path: str, recursive=False, file_types=(None)):
     return list
 
 
+def load_archive(archive_file):
+    # TODO replace relative paths with absolute paths eg. AUDIO TRACK PATH
+    with open(archive_file) as json_file:
+        data = json.load(json_file)
+        return data
+
+
 def load_frames(uid: str, folder: str):
     os.chdir(folder)
     path = os.getcwd()

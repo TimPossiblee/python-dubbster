@@ -13,18 +13,19 @@ class Source:
 
         if load_type is 'FFPROBE':
             self.loaded = self.ffprobe(file)
-        elif load_type is 'STORAGE':
+        elif load_type is 'ARCHIVE':
+            self.file_path = file["#aud"]["#path"]
             self.loaded = self.storage_info(file)
         else:
             self.loaded = False
 
-    def storage_info(self, file):
+    def storage_info(self, data):
         try:
-            self.duration_exact = float(file['duration_exact'])
-            self.duration = int(file['duration_exact'])
-            self.container_fps = file['fps']
-            self.container_size = f"{file['width']}x{file['height']}"
-            self.streams.append(Stream(file['audio'], 0, 'AUDIO', file['language']))
+            self.duration_exact = data["#media_info"]["duration"]
+            self.duration = int(self.duration_exact)
+            self.container_fps = data["#media_info"]["fps"]
+            self.container_size = data["#media_info"]["size"]
+            self.streams.append(Stream(0, 'AUDIO', "ger"))
         except Exception as e:
             print(e)
             return False
