@@ -1,6 +1,6 @@
-.idea
-backup
-batch
-logs
-tmp
-__pycache__
+/.idea
+/backup
+/batch
+/logs
+/tmp
+/__pycache__
