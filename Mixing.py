@@ -1,13 +1,14 @@
 import uuid
-
 from Container import Container
 import os
 import ImageProcessing
 import subprocess
 import math
-
+import datetime
 
 # mx = mixing / adr = automated dialogue replacement
+from log import log
+
 
 class Mixing:
     uid: str = str(uuid.uuid4())
@@ -16,12 +17,20 @@ class Mixing:
     mx_reference: str = None
     delay_ms: int = None
     file_out_path: str = None
+    successful = False
 
 
 # rtd = runtime difference
 def mix(mixing: Mixing, seek=(0.5, 0.85)):
     container: tuple = mixing.sources
     rtd: float = float(container[0].duration_exact) - float(container[1].duration_exact)
+
+    log.info(f"""
+
+{container[0].file_name} Runtime: {datetime.timedelta(seconds=container[0].duration_exact)}s FPS: {container[0].container_fps} 
+{container[1].file_name} Runtime: {datetime.timedelta(seconds=container[1].duration_exact)}s FPS: {container[1].container_fps}
+RTD: {rtd}s
+                """)
 
     delay: list = []
     index_offset = None
@@ -30,6 +39,8 @@ def mix(mixing: Mixing, seek=(0.5, 0.85)):
         os.makedirs(mixing.frame_path)
 
     for i in range(2):
+        log.info('pass {}'.format(i + 1))
+
         source = container[i]
 
         seek_time = seek[i] * container[0].duration
@@ -53,6 +64,14 @@ def mix(mixing: Mixing, seek=(0.5, 0.85)):
         result = min(results, key=lambda x: results.get(x))
         delay.append((adr_bulk.index(seek_index) - adr_bulk.index(result)))
         index_offset = adr_bulk.index(result) - adr_bulk.index(seek_index)
+
+        log.info(
+            f"Index: {adr_bulk.index(result)} Null: {adr_bulk.index(seek_index)} Difference: {results.get(result)}")
+
+    log.info(
+        [f"[Index: {delay[0]} Delay: {delay[0] / container[0].container_fps * 1000}]",
+         f"[Index: {delay[1]} Delay: {delay[1] / container[1].container_fps * 1000}]"]
+    )
 
     return calc_delay(delay, container[0].container_fps)
 
@@ -98,20 +117,25 @@ def merge(mixing: Mixing, delete_source=False, remove_multi_track=False):
     return True
 
 
-def load_sources(mx_source, adr_source) -> tuple:  # (mx_source, adr_source)
+def load_sources(mx_source, adr_source):
     mx_container = Container(mx_source)
     adr_container = Container(adr_source)
 
     if not mx_container.loaded or not adr_container.loaded:
-        return ()
+        log.error(
+            'container {} loaded {}/{}'.format((mx_container.file_path, adr_container.file_path),
+                                               mx_container.loaded, adr_container.loaded))
+        return None
 
     if not int(mx_container.container_fps * 100) != int(adr_container.container_fps * 100):
-        return ()
+        log.error('container {} fps do not match {}/{}'.format((mx_container.file_path, adr_container.file_path),
+                                                               mx_container.container_fps, adr_container.container_fps))
+        return None
 
     return mx_container, adr_container
 
 
-def vframes_offset(fps: float, rtd: float, seek_time: float, offset=None) -> tuple:  # (vframes, time_offset)
+def vframes_offset(fps: float, rtd: float, seek_time: float, offset=None):
     vframes = None
     time_offset = None
 
@@ -166,6 +190,7 @@ def calc_run_two(index_offset, seek_time, fps):
 
 
 def calc_delay(delay, fps):
-    cdelay = [delay[0] / fps * 1000, delay[1] / fps * 1000]
-    cdelay.sort(reverse=True)
-    return int((cdelay[0] + cdelay[1]) / 2)
+    if -2 <= (delay[0] - delay[1]) <= 2:
+        cdelay = [delay[0] / fps * 1000, delay[1] / fps * 1000]
+        cdelay.sort(reverse=True)
+        return int((cdelay[0] + cdelay[1]) / 2)
