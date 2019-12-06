@@ -126,8 +126,8 @@ def load_sources(mx_source, adr_source):
             'container {} loaded {}/{}'.format((mx_container.file_path, adr_container.file_path),
                                                mx_container.loaded, adr_container.loaded))
         return None
-
-    if not int(mx_container.container_fps * 100) != int(adr_container.container_fps * 100):
+    
+    if not int(mx_container.container_fps * 100) == int(adr_container.container_fps * 100):
         log.error('container {} fps do not match {}/{}'.format((mx_container.file_path, adr_container.file_path),
                                                                mx_container.container_fps, adr_container.container_fps))
         return None
@@ -140,12 +140,12 @@ def vframes_offset(fps: float, rtd: float, seek_time: float, offset=None):
     time_offset = None
 
     if type(offset) is int or (type(offset) is str and offset.isnumeric()):
-        vframes = calc_run_one_vframes(rtd, fps)
-        time_offset = seek_time - int(vframes / 2 / fps)
-    else:
         data = calc_run_two(offset, seek_time, fps)
         vframes = data['vframes']
         time_offset = data['time_offset']
+    else:
+        vframes = calc_run_one_vframes(rtd, fps)
+        time_offset = seek_time - int(vframes / 2 / fps)
 
     return vframes, time_offset
 
