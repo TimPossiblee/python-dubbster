@@ -53,7 +53,7 @@ def directory_sync(mx_source, adr_source, **kwargs):
     mixing_list = []
 
     for sources in FileHandler.load_tv(mx_source, adr_source):
-        mixing_list.append(sync(sources[0], sources[1], **kwargs))
+        mixing_list.append(sync(sources[0], sources[1], kwargs))
 
     for mixing in mixing_list:
         if mixing.successful:
