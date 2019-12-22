@@ -17,7 +17,8 @@ def sync_factory(**kwargs):
             directory_sync(inputs[0], inputs[1], **kwargs)
 
 
-def sync(mx_source: str, adr_source: str, merge=False, delete_mx_source=False, force=False, rm_existing_tracks=False):
+def sync(mx_source: str, adr_source: str, merge=False, delete_mx_source=False, force=False, rm_existing_tracks=False,
+         **kwargs):
     mixing = Mixing.Mixing()
 
     container = Mixing.load_sources(mx_source, adr_source)
