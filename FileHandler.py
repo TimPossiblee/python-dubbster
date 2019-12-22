@@ -39,7 +39,7 @@ def output_filename(file_name: str, file_directory: str):
     tmp = ""
     while tries <= 100:
         if not os.path.exists(os.path.join(file_directory, file_name + tmp + '.mkv')):
-            return file_name + tmp
+            return os.path.join(file_directory, file_name + tmp + '.mkv')
         else:
             tries += 1
             tmp = f" ({str(tries)})"
