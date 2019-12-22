@@ -12,7 +12,7 @@ def sync_factory(**kwargs):
         list_sync(inputs[0], **kwargs)
     elif len(inputs) == 2:
         if os.path.isfile(inputs[0]) and os.path.isfile(inputs[1]):
-            sync(inputs[0], inputs[1], kwargs)
+            sync(inputs[0], inputs[1], **kwargs)
         elif os.path.isdir(inputs[0]) and os.path.isdir(inputs[1]):
             directory_sync(inputs[0], inputs[1], **kwargs)
 
