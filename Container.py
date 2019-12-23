@@ -32,27 +32,27 @@ class Container:
             data = ffmpeg.probe(file, cmd='ffprobe')
             streams = []
 
-            self.duration = int(float(data["format"]["duration"]))
-            self.duration_exact = float(data["format"]["duration"])
-            path = data["format"]["filename"]
+            self.duration = int(float(data['format']['duration']))
+            self.duration_exact = float(data['format']['duration'])
+            path = data['format']['filename']
             self.file_directory, file_name = os.path.split(os.path.abspath(path))
             self.file_name, self.file_extension = os.path.splitext(file_name)
 
-            for stream in data["streams"]:
-                language = "und"
-                if "tags" in stream and "language" in stream["tags"]:
-                    language = stream["tags"]["language"]
+            for stream in data['streams']:
+                language = 'und'
+                if 'tags' in stream and 'language' in stream['tags']:
+                    language = stream['tags']['language']
 
-                obj = Stream(path, stream["index"], stream["codec_type"], language, stream["start_time"])
+                obj = Stream(path, stream['index'], stream['codec_type'], language, stream['start_time'])
 
-                if obj.codec_type == "video":
-                    obj.width = stream["width"]
-                    obj.height = stream["height"]
-                    obj.fps = eval(stream["r_frame_rate"])
+                if obj.codec_type == 'video':
+                    obj.width = stream['width']
+                    obj.height = stream['height']
+                    obj.fps = eval(stream['r_frame_rate'])
                     if self.container_fps is None:
                         self.container_fps = obj.fps
                     if self.container_size is None:
-                        self.container_size = f"{obj.width}x{obj.height}"
+                        self.container_size = f'{obj.width}x{obj.height}'
                 streams.append(obj)
 
             self.streams = streams
