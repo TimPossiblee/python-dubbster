@@ -10,11 +10,10 @@ import FileHandler
 def extract_frames(source: str, folder: str, time: str, size: str, vframes: int, quality=15):
     uid = str(uuid.uuid4())
 
-    ffmpeg.input(source, ss=str(datetime.timedelta(seconds=time))).output(folder + "\\" + uid + "_%d.jpg", s=size,
+    ffmpeg.input(source, ss=str(datetime.timedelta(seconds=time))).output(os.path.join(folder, uid + '_%d.jpg'), s=size,
                                                                           vframes=vframes,
                                                                           qscale=quality).run(capture_stdout=True,
                                                                                               capture_stderr=True)
-
     return FileHandler.load_frames(uid, folder)
 
 

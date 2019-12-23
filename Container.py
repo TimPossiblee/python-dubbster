@@ -57,5 +57,6 @@ class Container:
 
             self.streams = streams
             return True
-        except:
+        except Exception as ex:
+            print(ex)
             return False

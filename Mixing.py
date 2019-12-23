@@ -104,14 +104,15 @@ def merge(mixing: Mixing, delete_source=False, remove_multi_track=False):
 
         p_status = p.wait()
         exitcode = int(p_status)
-    except:
+    except Exception as ex:
+        print(ex)
         exitcode = 1
 
-    if exitcode != 0:
+    if exitcode != 0 and os.path.exists(mixing.file_out_path):
         os.remove(mixing.file_out_path)
         return False
 
-    if delete_source:
+    if delete_source and os.path.exists(mixing.file_out_path):
         os.remove(mx_container.file_path)
 
     return True
@@ -126,7 +127,7 @@ def load_sources(mx_source, adr_source):
             'container {} loaded {}/{}'.format((mx_container.file_path, adr_container.file_path),
                                                mx_container.loaded, adr_container.loaded))
         return None
-    
+
     if not int(mx_container.container_fps * 100) == int(adr_container.container_fps * 100):
         log.error('container {} fps do not match {}/{}'.format((mx_container.file_path, adr_container.file_path),
                                                                mx_container.container_fps, adr_container.container_fps))
