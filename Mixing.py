@@ -191,7 +191,7 @@ def calc_run_two(index_offset, seek_time, fps):
 
 
 def calc_delay(delay, fps):
-    if -2 <= (delay[0] - delay[1]) <= 2:
-        cdelay = [delay[0] / fps * 1000, delay[1] / fps * 1000]
-        cdelay.sort(reverse=True)
-        return int((cdelay[0] + cdelay[1]) / 2)
+    # if -2 <= (delay[0] - delay[1]) <= 2:
+    cdelay = [delay[0] / fps * 1000, delay[1] / fps * 1000]
+    cdelay.sort(reverse=True)
+    return int((cdelay[0] + cdelay[1]) / 2), -2 <= (delay[0] - delay[1]) <= 2

@@ -29,7 +29,7 @@ def sync(mx_source: str, adr_source: str, merge=False, delete_mx_source=False, f
     mixing.sources = container
 
     delay = Mixing.mix(mixing)
-    if delay is None:
+    if not force and False in delay:
         log.error('delay {} not acceptable'.format(delay))
         return mixing
 
@@ -38,7 +38,7 @@ def sync(mx_source: str, adr_source: str, merge=False, delete_mx_source=False, f
         log.info('not merging success')
         return mixing
 
-    mixing.delay_ms = delay
+    mixing.delay_ms = delay[0]
     mixing.file_out_path = FileHandler.output_filename(container[0].file_name, container[0].file_directory)
 
     if Mixing.merge(mixing, delete_source=delete_mx_source, remove_multi_track=rm_existing_tracks):
