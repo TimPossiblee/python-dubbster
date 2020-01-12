@@ -58,7 +58,7 @@ def directory_sync(mx_source, adr_source, **kwargs):
 
     for mixing in mixing_list:
         if mixing.successful:
-            log.info('success {}')
+            log.info('success {}'.format(mixing))
         else:
             log.error('')
 
