@@ -29,7 +29,7 @@ def sync(mx_source: str, adr_source: str, merge=False, delete_mx_source=False, f
     mixing.sources = container
 
     delay = Mixing.mix(mixing)
-    if not force and False in delay:
+    if not force and False in delay[1]:
         log.error('delay {} not acceptable'.format(delay))
         return mixing
 
